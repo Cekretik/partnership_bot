@@ -18,7 +18,6 @@ type User struct {
 	LastPayoutDate  time.Time
 	TotalBonus      float64
 	BonusToWithdraw float64
-	Referrals       []Referral `gorm:"foreignKey:ReferrerID"`
 }
 
 type Referral struct {

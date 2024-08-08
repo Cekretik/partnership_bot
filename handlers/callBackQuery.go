@@ -43,6 +43,24 @@ func HandleCallbackQuery(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	case "account":
 		msgText = accountMsg
 		replyMarkup = keyboards.OptionsKeyboard()
+	case "qr_code":
+		userID := update.CallbackQuery.From.ID
+		link := utils.GenerateReferralLink(int64(userID))
+		qrCode, err := utils.GenerateQRCode(link)
+		if err != nil {
+			log.Println("Error generating QR code:", err)
+			return
+		}
+
+		fileBytes := tgbotapi.FileBytes{
+			Name:  "qrcode.png",
+			Bytes: qrCode,
+		}
+		photoMsg := tgbotapi.NewPhoto(chatID, fileBytes)
+		photoMsg.Caption = "Ваш QR-код партнерской ссылки:"
+		if _, err := bot.Send(photoMsg); err != nil {
+			log.Println("Error sending QR code photo:", err)
+		}
 	default:
 		return
 	}

@@ -5,18 +5,70 @@ import (
 	"log"
 	"main/keyboards"
 	"main/models"
+	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 )
 
 func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
-	user := models.User{
-		Username: update.Message.From.UserName,
-		UserID:   update.Message.From.ID,
+	args := strings.Split(update.Message.Text, " ")
+	referrerID := int64(0)
+
+	if len(args) > 1 {
+		referrerID, _ = strconv.ParseInt(args[1], 10, 64)
 	}
 
-	db.FirstOrCreate(&user, models.User{UserID: user.UserID})
+	user := models.User{
+		Username:   update.Message.From.UserName,
+		UserID:     update.Message.From.ID,
+		IncomeRate: 1,
+	}
+
+	var existingUser models.User
+	db.First(&existingUser, "user_id = ?", user.UserID)
+
+	if existingUser.ID == 0 {
+		if referrerID != 0 && referrerID != user.UserID {
+			referral := models.Referral{
+				UserID:       user.UserID,
+				ReferralID:   referrerID,
+				ReferralName: user.Username,
+				ReferredBy:   referrerID,
+			}
+			db.Create(&referral)
+			var referrerUser models.User
+			db.First(&referrerUser, "user_id = ?", referrerID)
+			if referrerUser.ID != 0 {
+				referrerUser.ReferralCount++
+				db.Save(&referrerUser)
+			}
+		}
+
+		db.Create(&user)
+	} else {
+		if referrerID != 0 && referrerID != user.UserID {
+			var referral models.Referral
+			db.First(&referral, "user_id = ?", user.UserID)
+			if referral.ID == 0 {
+				referral = models.Referral{
+					UserID:       user.UserID,
+					ReferralID:   referrerID,
+					ReferralName: user.Username,
+					ReferredBy:   referrerID,
+				}
+				db.Create(&referral)
+
+				var referrerUser models.User
+				db.First(&referrerUser, "user_id = ?", referrerID)
+				if referrerUser.ID != 0 {
+					referrerUser.ReferralCount++
+					db.Save(&referrerUser)
+				}
+			}
+		}
+	}
 
 	// Сообщение с кнопкой "Меню"
 	menuText := fmt.Sprintf("%s, мы на связи и готовы помочь☺️", update.Message.From.FirstName)
@@ -28,8 +80,7 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 	}
 
 	// Сообщение с основными кнопками
-	mainMsgText := "Выберите интересующую вас тему:"
-	mainMsg := tgbotapi.NewMessage(update.Message.Chat.ID, mainMsgText)
+	mainMsg := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите интересующую вас тему:")
 	mainMsg.ReplyMarkup = keyboards.MainInlineKeyboard()
 
 	if _, err := bot.Send(mainMsg); err != nil {

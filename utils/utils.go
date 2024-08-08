@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/skip2/go-qrcode"
 )
 
 func GenerateReferralLink(userID int64) string {
@@ -15,4 +16,12 @@ func GenerateReferralLink(userID int64) string {
 	}
 	botLink := os.Getenv("BOT_LINK")
 	return fmt.Sprintf(botLink+"?start=%d", userID)
+}
+
+func GenerateQRCode(link string) ([]byte, error) {
+	png, err := qrcode.Encode(link, qrcode.Medium, 256)
+	if err != nil {
+		return nil, err
+	}
+	return png, nil
 }

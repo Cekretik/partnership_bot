@@ -2,13 +2,14 @@ package main
 
 import (
 	"log"
+	"os"
+	"strings"
+
 	"main/database"
 	"main/handlers"
-	"os"
-
-	"github.com/joho/godotenv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -33,12 +34,15 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil {
-			switch update.Message.Text {
-			case "/start":
+			if strings.HasPrefix(update.Message.Text, "/start") {
 				handlers.HandleStart(update, bot, db)
-			case "Меню":
-				handlers.HandleMenu(update, bot)
-			default:
+			} else {
+				switch update.Message.Text {
+				case "Меню":
+					handlers.HandleMenu(update, bot)
+				default:
+					// Handle other messages here
+				}
 			}
 		} else if update.CallbackQuery != nil {
 			handlers.HandleCallbackQuery(update, bot)
