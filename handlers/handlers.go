@@ -32,12 +32,12 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 	if existingUser.ID == 0 {
 		if referrerID != 0 && referrerID != user.UserID {
 			referral := models.Referral{
-				UserID:       user.UserID,
-				ReferralID:   referrerID,
-				ReferralName: user.Username,
-				ReferredBy:   referrerID,
+				UserID:     user.UserID,
+				UserName:   user.Username,
+				ReferredBy: referrerID,
 			}
 			db.Create(&referral)
+
 			var referrerUser models.User
 			db.First(&referrerUser, "user_id = ?", referrerID)
 			if referrerUser.ID != 0 {
@@ -47,30 +47,8 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 		}
 
 		db.Create(&user)
-	} else {
-		if referrerID != 0 && referrerID != user.UserID {
-			var referral models.Referral
-			db.First(&referral, "user_id = ?", user.UserID)
-			if referral.ID == 0 {
-				referral = models.Referral{
-					UserID:       user.UserID,
-					ReferralID:   referrerID,
-					ReferralName: user.Username,
-					ReferredBy:   referrerID,
-				}
-				db.Create(&referral)
-
-				var referrerUser models.User
-				db.First(&referrerUser, "user_id = ?", referrerID)
-				if referrerUser.ID != 0 {
-					referrerUser.ReferralCount++
-					db.Save(&referrerUser)
-				}
-			}
-		}
 	}
 
-	// Сообщение с кнопкой "Меню"
 	menuText := fmt.Sprintf("%s, мы на связи и готовы помочь☺️", update.Message.From.FirstName)
 	menuMsg := tgbotapi.NewMessage(update.Message.Chat.ID, menuText)
 	menuMsg.ReplyMarkup = keyboards.MenuButtonKeyboard()
@@ -79,7 +57,6 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 		log.Println("Error sending menu message:", err)
 	}
 
-	// Сообщение с основными кнопками
 	mainMsg := tgbotapi.NewMessage(update.Message.Chat.ID, "Выберите интересующую вас тему:")
 	mainMsg.ReplyMarkup = keyboards.MainInlineKeyboard()
 
@@ -87,7 +64,6 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 		log.Println("Error sending main message:", err)
 	}
 }
-
 func HandleMenu(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	msgText := fmt.Sprintf("%s, мы на связи и готовы помочь☺️", update.Message.From.FirstName)
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)

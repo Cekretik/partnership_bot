@@ -22,9 +22,8 @@ type User struct {
 
 type Referral struct {
 	gorm.Model
-	UserID       int64
-	ReferralID   int64
-	ReferralName string
-	TradeAmount  float64
-	ReferredBy   int64
+	UserID      int64
+	UserName    string
+	TradeAmount float64
+	ReferredBy  int64
 }
