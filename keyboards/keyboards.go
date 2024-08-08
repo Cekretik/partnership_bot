@@ -29,11 +29,12 @@ func PartnerProgramKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Список рефералов", "referral_list"),
-			tgbotapi.NewInlineKeyboardButtonData("Список начислений", "payment_list"),
+			//tgbotapi.NewInlineKeyboardButtonData("Список начислений", "payment_list"),
+			tgbotapi.NewInlineKeyboardButtonData("Вывод бонуса", "withdraw_bonus"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Как это работает", "how_it_works"),
-			tgbotapi.NewInlineKeyboardButtonData("Вывод бонуса", "withdraw_bonus"),
+			//tgbotapi.NewInlineKeyboardButtonData("Вывод бонуса", "withdraw_bonus"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("QR-код партнерской ссылки", "qr_code"),
@@ -55,12 +56,12 @@ func MenuButtonKeyboard() tgbotapi.ReplyKeyboardMarkup {
 func ExchangeOptionsKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Банкомат", "atm"),
-			tgbotapi.NewInlineKeyboardButtonData("Офис", "office"),
+			tgbotapi.NewInlineKeyboardButtonData("🏧Банкомат", "atm"),
+			tgbotapi.NewInlineKeyboardButtonData("🏢Офис", "office"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Курьер", "courier"),
-			tgbotapi.NewInlineKeyboardButtonData("На счет", "account"),
+			tgbotapi.NewInlineKeyboardButtonData("🚗Курьер", "courier"),
+			tgbotapi.NewInlineKeyboardButtonData("🧾На счет", "account"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("⬅️Назад", "back"),
