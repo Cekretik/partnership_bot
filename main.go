@@ -41,7 +41,7 @@ func main() {
 				case "Меню":
 					handlers.HandleMenu(update, bot)
 				default:
-					// Handle other messages here
+					handlers.HandleStart(update, bot, db)
 				}
 			}
 		} else if update.CallbackQuery != nil {
