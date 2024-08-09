@@ -19,12 +19,32 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 	chatID := update.Message.Chat.ID
 
 	if strings.HasPrefix(arg, "dialog_") {
-		userIDStr := strings.TrimPrefix(arg, "dialog_")
+		parts := strings.Split(arg, "_")
+		if len(parts) != 3 {
+			return
+		}
+
+		userIDStr := parts[1]
+		dialogIDStr := parts[2]
+
 		userID, err := strconv.Atoi(userIDStr)
-		if err == nil {
+		if err != nil {
+			return
+		}
+
+		dialogID, err := strconv.ParseInt(dialogIDStr, 10, 64)
+		if err != nil {
+			return
+		}
+
+		if dialog, exists := ActiveDialogs[userID]; exists && dialog.DialogID == dialogID {
 			StartDialog(bot, chatID, userID)
 			return
 		}
+
+		msg := tgbotapi.NewMessage(chatID, "Диалог недействителен или завершен.")
+		bot.Send(msg)
+		return
 	}
 
 	args := strings.Split(update.Message.Text, " ")

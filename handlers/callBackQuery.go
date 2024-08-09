@@ -54,7 +54,8 @@ func HandleCallbackQuery(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		msgText, replyMarkup = HandleWithdraw(callback)
 	case "manager":
 		HandleManagerRequest(bot, update, chatID, int(callback.From.ID))
-	case "end_dialog":
+		return
+	case "end_button":
 		HandleEndButton(bot, chatID)
 		return
 	default:
