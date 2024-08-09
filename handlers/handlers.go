@@ -15,6 +15,18 @@ import (
 )
 
 func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
+	arg := update.Message.CommandArguments()
+	chatID := update.Message.Chat.ID
+
+	if strings.HasPrefix(arg, "dialog_") {
+		userIDStr := strings.TrimPrefix(arg, "dialog_")
+		userID, err := strconv.Atoi(userIDStr)
+		if err == nil {
+			StartDialog(bot, chatID, userID)
+			return
+		}
+	}
+
 	args := strings.Split(update.Message.Text, " ")
 	referrerID := int64(0)
 

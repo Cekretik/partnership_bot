@@ -32,6 +32,8 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
+	go handlers.MonitorDialogs(bot)
+
 	for update := range updates {
 		if update.Message != nil {
 			if strings.HasPrefix(update.Message.Text, "/start") {
@@ -40,8 +42,11 @@ func main() {
 				switch update.Message.Text {
 				case "Меню":
 					handlers.HandleMenu(update, bot)
+				case "end":
+					handlers.HandleEndCommand(bot, update)
 				default:
-					handlers.HandleStart(update, bot, db)
+					handlers.HandleMessages(bot, update)
+					//handlers.HandleStart(update, bot, db)
 				}
 			}
 		} else if update.CallbackQuery != nil {

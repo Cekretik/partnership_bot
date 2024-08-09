@@ -52,8 +52,11 @@ func HandleCallbackQuery(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		replyMarkup = keyboards.BackButton()
 	case "withdraw_bonus":
 		msgText, replyMarkup = HandleWithdraw(callback)
-	// case "manager":
-	// 	msgText, replyMarkup = HandleManagerRequest(callback, bot)
+	case "manager":
+		HandleManagerRequest(bot, update, chatID, int(callback.From.ID))
+	case "end_dialog":
+		HandleEndButton(bot, chatID)
+		return
 	default:
 		return
 	}
