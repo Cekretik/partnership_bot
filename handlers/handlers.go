@@ -98,6 +98,7 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 		log.Println("Error sending main message:", err)
 	}
 }
+
 func HandleMenu(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	msgText := fmt.Sprintf("%s, мы на связи и готовы помочь☺️", update.Message.From.FirstName)
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)
@@ -130,7 +131,7 @@ func HandleWithdraw(callback *tgbotapi.CallbackQuery) (string, tgbotapi.InlineKe
 	} else {
 		msgText := fmt.Sprintf("💳Ваш бонус для вывода: %.2f", user.BonusToWithdraw)
 
-		withdrawButton := tgbotapi.NewInlineKeyboardButtonData("Вывести", "withdraw_confirm")
+		withdrawButton := tgbotapi.NewInlineKeyboardButtonData("Вывести", "manager")
 		backButton := tgbotapi.NewInlineKeyboardButtonData("⬅️Назад", "back_to_partner")
 
 		replyMarkup := tgbotapi.NewInlineKeyboardMarkup(
@@ -156,8 +157,8 @@ func HandlePartnerProgram(callback *tgbotapi.CallbackQuery) (string, tgbotapi.In
 
 	referralLink := utils.GenerateReferralLink(user.UserID)
 	msgText := fmt.Sprintf(
-		"🔍Ваш ID: %d\n\n🤵‍♂️Количество рефералов: %d\n\n♻️Заработано всего: %.2f\n\n🔗Ваша партнерская ссылка: %s",
-		user.UserID, user.ReferralCount, user.TotalBonus, referralLink,
+		"🔍Ваш ID: %d\n\n🤵‍♂️Количество рефералов: %d\n\nСумма обменов ваших рефералов: %.2f\n\n♻️Заработано всего: %.2f\n\n🔗Ваша партнерская ссылка: %s",
+		user.UserID, user.ReferralCount, user.ReferralTotal, user.TotalBonus, referralLink,
 	)
 	replyMarkup := keyboards.PartnerProgramKeyboard()
 

@@ -69,7 +69,6 @@ func HandleCallbackQuery(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		log.Println("Error sending callback message:", err)
 	}
 
-	// Удаляем сообщение с кнопками, чтобы не было дубликатов
 	deleteMsg := tgbotapi.NewDeleteMessage(chatID, callback.Message.MessageID)
 	if _, err := bot.Request(deleteMsg); err != nil {
 		log.Println("Error deleting callback message:", err)

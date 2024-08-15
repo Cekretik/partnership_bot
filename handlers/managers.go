@@ -27,22 +27,18 @@ func HandleMessages(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	chatID := update.Message.Chat.ID
 
 	if dialog, isInDialogue := ActiveDialogs[int(userID)]; isInDialogue {
-		// Пересылаем сообщение от пользователя к менеджеру
 		msg := tgbotapi.NewMessage(dialog.ManagerChatID, update.Message.Text)
 		bot.Send(msg)
 
-		// Обновляем время последней активности
 		ActiveDialogs[int(userID)] = ActiveDialog{
 			ManagerChatID: dialog.ManagerChatID,
 			LastActivity:  time.Now().Unix(),
 			DialogID:      dialog.DialogID,
 		}
 	} else if userID, isInDialogue := findUserByManagerChatID(chatID); isInDialogue {
-		// Пересылаем сообщение от менеджера к пользователю
 		msg := tgbotapi.NewMessage(int64(userID), update.Message.Text)
 		bot.Send(msg)
 
-		// Обновляем время последней активности
 		ActiveDialogs[userID] = ActiveDialog{
 			ManagerChatID: chatID,
 			LastActivity:  time.Now().Unix(),
@@ -61,45 +57,38 @@ func HandleManagerRequest(bot *tgbotapi.BotAPI, update tgbotapi.Update, chatID i
 		log.Fatal("Error parsing MANAGER_CHAT environment variable:", err)
 	}
 
-	// Проверка, не находится ли уже менеджер в диалоге с этим пользователем
 	if isUserInDialogue(userID) {
 		msg := tgbotapi.NewMessage(chatID, "Вы уже находитесь в диалоге с менеджером.")
 		bot.Send(msg)
 		return
 	}
 
-	// Генерация нового уникального ID диалога
 	dialogID := GenerateNextDialogID()
 
-	// Обновление ActiveDialogs с новым DialogID
 	ActiveDialogs[userID] = ActiveDialog{
-		ManagerChatID: 0, // Установится при соединении с менеджером
+		ManagerChatID: 0,
 		LastActivity:  time.Now().Unix(),
 		DialogID:      dialogID,
 	}
 
-	// Формирование ссылки для начала диалога
 	dialogLink := fmt.Sprintf("%s?start=dialog_%d_%d", botLink, userID, dialogID)
 
-	// Сообщение для группы менеджеров
 	notificationMsg := fmt.Sprintf("Пользователь @%s запросил общение с менеджером. Нажмите на ссылку для начала диалога: %s", update.CallbackQuery.From.UserName, dialogLink)
 	msg := tgbotapi.NewMessage(managerGroupChatID, notificationMsg)
 	bot.Send(msg)
 
-	// Уведомление пользователя
 	userMsg := tgbotapi.NewMessage(chatID, "Запрос на общение с менеджером отправлен.")
 	bot.Send(userMsg)
 }
 
 func StartDialog(bot *tgbotapi.BotAPI, managerChatID int64, userID int) {
-	// Проверка, не состоит ли уже другой менеджер в диалоге с этим пользователем
 	if dialog, exists := ActiveDialogs[userID]; exists {
-		if dialog.ManagerChatID != 0 && time.Now().Unix() < dialog.LastActivity+10 { // 1 час в секундах
+		if dialog.ManagerChatID != 0 && time.Now().Unix() < dialog.LastActivity+600 { // в секундах
 			msg := tgbotapi.NewMessage(managerChatID, "Другой менеджер уже общается с этим пользователем.")
 			bot.Send(msg)
 			return
 		}
-		delete(ActiveDialogs, userID) // Удаляем старый диалог
+		delete(ActiveDialogs, userID)
 	}
 
 	// Устанавливаем диалог
@@ -110,15 +99,12 @@ func StartDialog(bot *tgbotapi.BotAPI, managerChatID int64, userID int) {
 		DialogID:      dialogID,
 	}
 
-	// Уведомляем менеджера
 	msg := tgbotapi.NewMessage(managerChatID, fmt.Sprintf("Вы начали диалог с пользователем %d. Напишите сообщение для общения.", userID))
 	bot.Send(msg)
 
-	// Уведомляем пользователя
 	userMsg := tgbotapi.NewMessage(int64(userID), "Менеджер присоединился к чату. Вы можете начать общение.")
 	bot.Send(userMsg)
 
-	// Добавляем кнопку завершения диалога для менеджера и пользователя
 	managerEndDialogButton := tgbotapi.NewInlineKeyboardButtonData("Завершить диалог", "end_dialog")
 	userEndDialogButton := tgbotapi.NewInlineKeyboardButtonData("Завершить диалог", "end_dialog")
 
@@ -129,12 +115,10 @@ func StartDialog(bot *tgbotapi.BotAPI, managerChatID int64, userID int) {
 		tgbotapi.NewInlineKeyboardRow(userEndDialogButton),
 	)
 
-	// Отправляем сообщение менеджеру
 	managerMessage := tgbotapi.NewMessage(managerChatID, "Нажмите кнопку, чтобы завершить диалог.")
 	managerMessage.ReplyMarkup = managerKeyboard
 	bot.Send(managerMessage)
 
-	// Отправляем сообщение пользователю
 	userMessage := tgbotapi.NewMessage(int64(userID), "Нажмите кнопку, чтобы завершить диалог.")
 	userMessage.ReplyMarkup = userKeyboard
 	bot.Send(userMessage)
@@ -143,12 +127,9 @@ func StartDialog(bot *tgbotapi.BotAPI, managerChatID int64, userID int) {
 func HandleEndButton(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	chatID := update.CallbackQuery.Message.Chat.ID
 
-	// Проверка, является ли этот chatID менеджером или пользователем
 	if userID, isManager := findUserByManagerChatID(chatID); isManager {
-		// Менеджер завершает диалог
 		endDialog(bot, userID)
 	} else {
-		// Пользователь завершает диалог
 		if _, exists := ActiveDialogs[int(chatID)]; exists {
 			endDialog(bot, int(chatID))
 		}
@@ -164,7 +145,6 @@ func endDialog(bot *tgbotapi.BotAPI, userID int) {
 	if dialog, exists := ActiveDialogs[userID]; exists {
 		delete(ActiveDialogs, userID)
 
-		// Уведомляем менеджера, если он еще в чате
 		if dialog.ManagerChatID != 0 {
 			managerMsg := tgbotapi.NewMessage(dialog.ManagerChatID, "Диалог с пользователем завершен.")
 			bot.Send(managerMsg)
@@ -178,7 +158,7 @@ func endDialog(bot *tgbotapi.BotAPI, userID int) {
 
 func MonitorDialogs(bot *tgbotapi.BotAPI) {
 	for {
-		time.Sleep(1 * time.Minute)
+		time.Sleep(10 * time.Minute)
 
 		currentTime := time.Now().Unix()
 		for userID, dialog := range ActiveDialogs {

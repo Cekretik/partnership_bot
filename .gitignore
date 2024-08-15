@@ -4,3 +4,4 @@ main.go.exe
 .DS_Store
 .idea
 .env
+credentials.json

@@ -20,7 +20,7 @@ func MainInlineKeyboard() tgbotapi.InlineKeyboardMarkup {
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Связаться с менеджером", "manager"),
-			tgbotapi.NewInlineKeyboardButtonData("Запросить курс", "request"),
+			tgbotapi.NewInlineKeyboardButtonData("Запросить курс", "manager"),
 		),
 	)
 }
@@ -72,7 +72,7 @@ func ExchangeOptionsKeyboard() tgbotapi.InlineKeyboardMarkup {
 func ATMOptionsKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Обменять", "exchange_now"),
+			tgbotapi.NewInlineKeyboardButtonData("Обменять", "manager"),
 			tgbotapi.NewInlineKeyboardButtonData("Инструкция", "instruction"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
@@ -85,7 +85,7 @@ func ATMOptionsKeyboard() tgbotapi.InlineKeyboardMarkup {
 func OptionsKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Обменять", "exchange_now"),
+			tgbotapi.NewInlineKeyboardButtonData("Обменять", "manager"),
 			tgbotapi.NewInlineKeyboardButtonData("⬅️Назад", "backToOptions"),
 		),
 	)
