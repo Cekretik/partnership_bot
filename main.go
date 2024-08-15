@@ -32,10 +32,9 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 	go handlers.MonitorDialogs(bot)
-	log.Println("Fetching data with range: ", "Sheet1!A:G")
 	go utils.StartUpdateRoutine(
 		db,
-		"1ThppiAvyGMgTtR2OVju-Xbnt5AAOwB6hc_vETa-VYig", "Партнерская программа!A5:G",
+		"1ThppiAvyGMgTtR2OVju-Xbnt5AAOwB6hc_vETa-VYig", "Партнерская программа!A6:G",
 		"1DNLJqnOtkeh3PNZS0QXvQuKT3fupK3cZvMKyXTvg2hQ", "Партнерская программа!B6:B",
 		"1QvfoZa4BhbMMj2DLCXR1PjOZenSsQ5AnkC3_oLbj6xg", "CRM_партнерка!B3:C",
 	)

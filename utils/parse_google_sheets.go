@@ -3,6 +3,7 @@ package utils
 import (
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"main/models"
@@ -21,59 +22,80 @@ func UpdateUserFromSheet(db *gorm.DB, userID string, values []interface{}) {
 	db.First(&user, "user_id = ?", id)
 
 	if user.ID == 0 {
+		// Create a new user if they do not exist in the database
 		user = models.User{UserID: id}
 	}
 
+	// Function to clean and convert a string to float64
+	convertToFloat := func(value string) (float64, error) {
+		// Remove currency symbols and commas
+		cleaned := strings.ReplaceAll(value, "฿", "")
+		cleaned = strings.ReplaceAll(cleaned, ",", "")
+		return strconv.ParseFloat(cleaned, 64)
+	}
+
+	// Check and convert each value from the sheet.
 	if len(values) > 2 {
 		if v, ok := values[2].(string); ok {
-			if val, err := strconv.ParseInt(v, 10, 64); err == nil {
-				user.ReferralCount = int(val)
-			} else {
-				log.Printf("Invalid ReferralCount for user %d: %v", id, err)
+			if v != "" {
+				if val, err := strconv.ParseInt(v, 10, 64); err == nil {
+					user.ReferralCount = int(val)
+				} else {
+					log.Printf("Invalid ReferralCount for user %d: %v", id, err)
+				}
 			}
 		}
 	}
 
 	if len(values) > 3 {
 		if v, ok := values[3].(string); ok {
-			if val, err := strconv.ParseFloat(v, 64); err == nil {
-				user.IncomeRate = val
-			} else {
-				log.Printf("Invalid IncomeRate for user %d: %v", id, err)
+			if v != "" {
+				if val, err := convertToFloat(v); err == nil {
+					user.IncomeRate = val
+				} else {
+					log.Printf("Invalid IncomeRate for user %d: %v", id, err)
+				}
 			}
 		}
 	}
 
 	if len(values) > 4 {
 		if v, ok := values[4].(string); ok {
-			if val, err := strconv.ParseFloat(v, 64); err == nil {
-				user.ReferralTotal = val
-			} else {
-				log.Printf("Invalid ReferralTotal for user %d: %v", id, err)
+			if v != "" {
+				if val, err := convertToFloat(v); err == nil {
+					user.ReferralTotal = val
+				} else {
+					log.Printf("Invalid ReferralTotal for user %d: %v", id, err)
+				}
 			}
 		}
 	}
 
 	if len(values) > 5 {
 		if v, ok := values[5].(string); ok {
-			if val, err := strconv.ParseFloat(v, 64); err == nil {
-				user.TotalBonus = val
-			} else {
-				log.Printf("Invalid TotalBonus for user %d: %v", id, err)
+			if v != "" {
+				if val, err := convertToFloat(v); err == nil {
+					user.TotalBonus = val
+				} else {
+					log.Printf("Invalid TotalBonus for user %d: %v", id, err)
+				}
 			}
 		}
 	}
 
 	if len(values) > 6 {
 		if v, ok := values[6].(string); ok {
-			if val, err := strconv.ParseFloat(v, 64); err == nil {
-				user.BonusToWithdraw = val
-			} else {
-				log.Printf("Invalid BonusToWithdraw for user %d: %v", id, err)
+			if v != "" {
+				if val, err := convertToFloat(v); err == nil {
+					user.BonusToWithdraw = val
+				} else {
+					log.Printf("Invalid BonusToWithdraw for user %d: %v", id, err)
+				}
 			}
 		}
 	}
 
+	// Update or create the user record in the database.
 	db.Save(&user)
 }
 
@@ -120,7 +142,7 @@ func StartUpdateRoutine(db *gorm.DB, sheetID1, range1, sheetID2, range2, sheetID
 		}
 
 		for i, row := range values {
-			if i == 0 {
+			if i == 1 {
 				continue
 			}
 

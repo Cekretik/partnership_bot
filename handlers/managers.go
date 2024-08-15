@@ -73,11 +73,11 @@ func HandleManagerRequest(bot *tgbotapi.BotAPI, update tgbotapi.Update, chatID i
 
 	dialogLink := fmt.Sprintf("%s?start=dialog_%d_%d", botLink, userID, dialogID)
 
-	notificationMsg := fmt.Sprintf("Пользователь @%s запросил общение с менеджером. Нажмите на ссылку для начала диалога: %s", update.CallbackQuery.From.UserName, dialogLink)
+	notificationMsg := fmt.Sprintf("Пользователь @%s запросил диалог с менеджером. Нажмите на ссылку для начала диалога: %s", update.CallbackQuery.From.UserName, dialogLink)
 	msg := tgbotapi.NewMessage(managerGroupChatID, notificationMsg)
 	bot.Send(msg)
 
-	userMsg := tgbotapi.NewMessage(chatID, "Запрос на общение с менеджером отправлен.")
+	userMsg := tgbotapi.NewMessage(chatID, "Запрос на диалог с менеджером отправлен.")
 	bot.Send(userMsg)
 }
 
@@ -99,10 +99,10 @@ func StartDialog(bot *tgbotapi.BotAPI, managerChatID int64, userID int) {
 		DialogID:      dialogID,
 	}
 
-	msg := tgbotapi.NewMessage(managerChatID, fmt.Sprintf("Вы начали диалог с пользователем %d. Напишите сообщение для общения.", userID))
+	msg := tgbotapi.NewMessage(managerChatID, fmt.Sprintf("Вы начали диалог с пользователем %d. Вы можете начать диалог.", userID))
 	bot.Send(msg)
 
-	userMsg := tgbotapi.NewMessage(int64(userID), "Менеджер присоединился к чату. Вы можете начать общение.")
+	userMsg := tgbotapi.NewMessage(int64(userID), "Менеджер присоединился к чату. Вы можете начать диалог.")
 	bot.Send(userMsg)
 
 	managerEndDialogButton := tgbotapi.NewInlineKeyboardButtonData("Завершить диалог", "end_dialog")
