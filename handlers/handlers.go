@@ -157,7 +157,7 @@ func HandlePartnerProgram(callback *tgbotapi.CallbackQuery) (string, tgbotapi.In
 
 	referralLink := utils.GenerateReferralLink(user.UserID)
 	msgText := fmt.Sprintf(
-		"🔍Ваш ID: %d\n\n🤵‍♂️Количество рефералов: %d\n\n💱Сумма обменов ваших рефералов: %.2f\n\n♻️Заработано всего: %.2f\n\n🔗Ваша партнерская ссылка: %s",
+		"🔍Ваш ID: %d\n\n👤Количество рефералов: %d\n\n💱Сумма обменов ваших рефералов: %.2f\n\n💵Заработано всего: %.2f\n\n🔗Ваша партнерская ссылка: %s",
 		user.UserID, user.ReferralCount, user.ReferralTotal, user.TotalBonus, referralLink,
 	)
 	replyMarkup := keyboards.PartnerProgramKeyboard()

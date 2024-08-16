@@ -16,11 +16,12 @@ func MainInlineKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Партнерская программа", "partner"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Способы обмена", "exchange"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Связаться с менеджером", "manager"),
-			tgbotapi.NewInlineKeyboardButtonData("Запросить курс", "manager"),
 		),
 	)
 }
