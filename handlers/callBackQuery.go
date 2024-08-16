@@ -125,8 +125,9 @@ func sendInstructionPhotos(bot *tgbotapi.BotAPI, chatID int64) {
 	}
 
 	msg := tgbotapi.NewMediaGroup(chatID, mediaGroup)
-	_, err = bot.Send(msg)
+	_, err = bot.Request(msg)
 	if err != nil {
 		log.Println("Error sending media group:", err)
+		return
 	}
 }
