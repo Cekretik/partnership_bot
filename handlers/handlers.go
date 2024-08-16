@@ -100,7 +100,7 @@ func HandleStart(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *gorm.DB) {
 }
 
 func HandleMenu(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
-	msgText := fmt.Sprintf("%s, мы на связи и готовы помочь☺️", update.Message.From.FirstName)
+	msgText := fmt.Sprintln("Главное меню:")
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)
 	msg.ReplyMarkup = keyboards.MainInlineKeyboard()
 
