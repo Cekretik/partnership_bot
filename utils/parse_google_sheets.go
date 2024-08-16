@@ -127,6 +127,55 @@ func UpdateCRMReferralsSheet(db *gorm.DB, sheetID, writeRange string) {
 	}
 }
 
+func UpdateReferralTradeAmount(db *gorm.DB, sheetID, readRange string) {
+	values, err := GetGoogleSheetData(sheetID, readRange)
+	if err != nil {
+		log.Println("Error reading Google Sheets:", err)
+		return
+	}
+
+	for i, row := range values {
+		if len(row) >= 3 {
+			userIDStr, ok := row[0].(string)
+			if !ok {
+				log.Printf("Invalid UserID format in row %d", i+1)
+				continue
+			}
+
+			userID, err := strconv.ParseInt(userIDStr, 10, 64)
+			if err != nil {
+				log.Printf("Invalid UserID in row %d: %v", i+1, err)
+				continue
+			}
+
+			tradeAmountStr, ok := row[2].(string)
+			if !ok {
+				log.Printf("Invalid TradeAmount format in row %d", i+1)
+				continue
+			}
+
+			tradeAmountStr = strings.ReplaceAll(tradeAmountStr, "฿", "")
+			tradeAmount, err := strconv.ParseFloat(tradeAmountStr, 64)
+			if err != nil {
+				log.Printf("Invalid TradeAmount in row %d: %v", i+1, err)
+				continue
+			}
+
+			var referral models.Referral
+			if err := db.First(&referral, "user_id = ?", userID).Error; err != nil {
+				log.Printf("Referral not found for UserID %d in row %d", userID, i+1)
+				continue
+			}
+
+			referral.TradeAmount = tradeAmount
+
+			if err := db.Save(&referral).Error; err != nil {
+				log.Printf("Failed to update TradeAmount for UserID %d in row %d: %v", userID, i+1, err)
+			}
+		}
+	}
+}
+
 func StartUpdateRoutine(db *gorm.DB, sheetID1, range1, sheetID2, range2, sheetID3, range3 string) {
 	ticker := time.NewTicker(5 * time.Second)
 	log.Printf("Starting scheduled update every 5 seconds...")
@@ -157,5 +206,7 @@ func StartUpdateRoutine(db *gorm.DB, sheetID1, range1, sheetID2, range2, sheetID
 
 		// Update Referrals and Partners in "БАЗА СДЕЛОК, CRM"
 		UpdateCRMReferralsSheet(db, sheetID3, range3)
+
+		UpdateReferralTradeAmount(db, sheetID3, range3)
 	}
 }

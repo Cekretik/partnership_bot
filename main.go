@@ -34,9 +34,9 @@ func main() {
 	go handlers.MonitorDialogs(bot)
 	go utils.StartUpdateRoutine(
 		db,
-		"1ThppiAvyGMgTtR2OVju-Xbnt5AAOwB6hc_vETa-VYig", "Партнерская программа!A6:G",
-		"1DNLJqnOtkeh3PNZS0QXvQuKT3fupK3cZvMKyXTvg2hQ", "Партнерская программа!B6:B",
-		"1QvfoZa4BhbMMj2DLCXR1PjOZenSsQ5AnkC3_oLbj6xg", "CRM_партнерка!B3:C",
+		"1GcJ6b_j1ZPx-33mlVV9sIEPXraH82nt7MdsH6PpyAfk", "Партнерская программа1!A6:G",
+		"1GcJ6b_j1ZPx-33mlVV9sIEPXraH82nt7MdsH6PpyAfk", "Партнерская программа!B6:B",
+		"1GcJ6b_j1ZPx-33mlVV9sIEPXraH82nt7MdsH6PpyAfk", "CRM_партнерка!B3:D",
 	)
 
 	for update := range updates {
