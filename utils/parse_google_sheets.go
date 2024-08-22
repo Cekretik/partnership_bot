@@ -11,6 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
+func convertToFloat(value string) (float64, error) {
+	cleaned := strings.ReplaceAll(value, "฿", "")
+	cleaned = strings.ReplaceAll(cleaned, ",", "")
+	return strconv.ParseFloat(cleaned, 64)
+}
+
 func UpdateUserFromSheet(db *gorm.DB, userID string, values []interface{}) {
 	var user models.User
 	id, err := strconv.ParseInt(userID, 10, 64)
@@ -22,19 +28,9 @@ func UpdateUserFromSheet(db *gorm.DB, userID string, values []interface{}) {
 	db.First(&user, "user_id = ?", id)
 
 	if user.ID == 0 {
-		// Create a new user if they do not exist in the database
 		user = models.User{UserID: id}
 	}
 
-	// Function to clean and convert a string to float64
-	convertToFloat := func(value string) (float64, error) {
-		// Remove currency symbols and commas
-		cleaned := strings.ReplaceAll(value, "฿", "")
-		cleaned = strings.ReplaceAll(cleaned, ",", "")
-		return strconv.ParseFloat(cleaned, 64)
-	}
-
-	// Check and convert each value from the sheet.
 	if len(values) > 2 {
 		if v, ok := values[2].(string); ok {
 			if v != "" {
@@ -95,7 +91,6 @@ func UpdateUserFromSheet(db *gorm.DB, userID string, values []interface{}) {
 		}
 	}
 
-	// Update or create the user record in the database.
 	db.Save(&user)
 }
 
@@ -154,8 +149,7 @@ func UpdateReferralTradeAmount(db *gorm.DB, sheetID, readRange string) {
 				continue
 			}
 
-			tradeAmountStr = strings.ReplaceAll(tradeAmountStr, "฿", "")
-			tradeAmount, err := strconv.ParseFloat(tradeAmountStr, 64)
+			tradeAmount, err := convertToFloat(tradeAmountStr)
 			if err != nil {
 				log.Printf("Invalid TradeAmount in row %d: %v", i+1, err)
 				continue
@@ -177,7 +171,7 @@ func UpdateReferralTradeAmount(db *gorm.DB, sheetID, readRange string) {
 }
 
 func StartUpdateRoutine(db *gorm.DB, sheetID1, range1, sheetID2, range2, sheetID3, range3 string) {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(5 * time.Minute)
 	log.Printf("Starting scheduled update every 5 seconds...")
 	defer ticker.Stop()
 

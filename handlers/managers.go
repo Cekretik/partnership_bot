@@ -177,7 +177,6 @@ func endDialog(bot *tgbotapi.BotAPI, userID int, manuallyEnded bool) {
 			bot.Send(userMsg)
 		}
 
-		// Remove manager from the active dialogs
 		delete(ManagerDialogs, dialog.ManagerChatID)
 	}
 }

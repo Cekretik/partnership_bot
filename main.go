@@ -45,7 +45,7 @@ func main() {
 				handlers.HandleStart(update, bot, db)
 			} else {
 				switch update.Message.Text {
-				case "Главное меню":
+				case "Меню":
 					handlers.HandleMenu(update, bot)
 				case "end":
 					handlers.HandleEndCommand(bot, update)

@@ -49,7 +49,7 @@ func PartnerProgramKeyboard() tgbotapi.InlineKeyboardMarkup {
 func MenuButtonKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	return tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Главное меню"),
+			tgbotapi.NewKeyboardButton("Меню"),
 		),
 	)
 }
